@@ -32,7 +32,7 @@ class Player(pygame.sprite.Sprite):
 
         # Cannon event handler
         if keys[pygame.K_SPACE] and self.__cannon.is_cannon_available:
-            self.__cannon.shoot_cannon(self.rect.center)
+            self.__cannon.shoot_cannon((self.rect.centerx, self.rect.centery - 64))
             self.__cannon.is_cannon_available = False
             self.__cannon.cannon_time = pygame.time.get_ticks()
 
