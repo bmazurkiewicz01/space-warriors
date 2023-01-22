@@ -36,6 +36,7 @@ class GameManager:
                 if self.__main_menu.new_game:
                     self.__initialize_player()
                     self.__main_menu.new_game = False
+                    pygame.time.wait(100)
                 self.__player_handler()
             else:
                 self.__main_menu.run()
@@ -62,3 +63,5 @@ class GameManager:
         self.__player_sprite.update()
         self.__player_sprite.draw(self.__screen)
         self.__player.cannon.cannonballs.draw(self.__screen)
+        self.__player.red_laser.lasers.draw(self.__screen)
+        self.__player.blue_laser.lasers.draw(self.__screen)
