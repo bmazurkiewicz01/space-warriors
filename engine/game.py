@@ -62,6 +62,5 @@ class GameManager:
     def __player_handler(self):
         self.__player_sprite.update()
         self.__player_sprite.draw(self.__screen)
-        self.__player.cannon.cannonballs.draw(self.__screen)
-        self.__player.red_laser.lasers.draw(self.__screen)
-        self.__player.blue_laser.lasers.draw(self.__screen)
+        for weapon in self.__player.weapons:
+            weapon.weapon_shots.draw(self.__screen)
