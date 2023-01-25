@@ -4,11 +4,12 @@ from engine.weapon.laser.laser import Laser
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, player_position, screen_width, screen_height, speed):
+    def __init__(self, player_position, screen_width, screen_height, speed, screen):
         # Initialization of player
         super().__init__()
         self.image = pygame.image.load("resources/spaceship1.png").convert_alpha()
         self.rect = self.image.get_rect(midbottom=player_position)
+        self.__screen = screen
 
         # Player movement attributes
         self.__screen_width = screen_width
@@ -16,7 +17,8 @@ class Player(pygame.sprite.Sprite):
         self.__speed = speed
 
         # Create weapons objects
-        self.__weapons = [Cannon(2000, screen_height), Laser(300, screen_height, (255, 0, 0)), Laser(300, screen_height, (0, 0, 255))]
+        self.__weapons = [Cannon(3000, screen_height), Laser(1200, screen_height, (255, 0, 0)),
+                          Laser(1200, screen_height, (0, 0, 255))]
 
     @property
     def weapons(self):
@@ -58,5 +60,6 @@ class Player(pygame.sprite.Sprite):
         self.__adjust_player_position()
 
         # Refresh weapons status
-        for weapon in self.__weapons:
-            weapon.refresh_weapon()
+        self.__weapons[0].refresh_weapon(self.__screen, 10, self.__screen_height - 30, (169, 169, 169), (255, 255, 255))
+        self.__weapons[1].refresh_weapon(self.__screen, self.__screen_width - 220, self.__screen_height - 30, (255, 0, 0), (255, 255, 255))
+        self.__weapons[2].refresh_weapon(self.__screen, self.__screen_width - 110, self.__screen_height - 30, (0, 0, 255), (255, 255, 255))

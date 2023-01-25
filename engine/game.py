@@ -56,7 +56,7 @@ class GameManager:
             self.__clock.tick(60)
 
     def __initialize_player(self):
-        self.__player = Player((self.__width / 2, self.__height - 50), self.__width, self.__height, 10)
+        self.__player = Player((self.__width / 2, self.__height - 80), self.__width, self.__height, 10, self.__screen)
         self.__player_sprite = pygame.sprite.GroupSingle(self.__player)
 
     def __player_handler(self):
