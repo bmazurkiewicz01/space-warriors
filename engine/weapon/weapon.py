@@ -50,7 +50,6 @@ class Weapon(ABC):
         text_rect.y = y - 25
         screen.blit(weapon_name_text, text_rect)
 
-
     def __load_weapon(self, screen, bar_x, bar_y, bar_color, empty_bar_color):
         if self.__is_weapon_available:
             self.__render_loading_bar(1, screen, bar_x, bar_y, 100, 20, bar_color, empty_bar_color)
