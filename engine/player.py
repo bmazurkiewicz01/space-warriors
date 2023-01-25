@@ -17,8 +17,8 @@ class Player(pygame.sprite.Sprite):
         self.__speed = speed
 
         # Create weapons objects
-        self.__weapons = [Cannon(3000, screen_height), Laser(1200, screen_height, (255, 0, 0)),
-                          Laser(1200, screen_height, (0, 0, 255))]
+        self.__weapons = [Cannon(3000, screen_height, "Cannon"), Laser(1200, screen_height, "Red Laser", (255, 0, 0)),
+                          Laser(1200, screen_height, "Blue Laser", (0, 0, 255))]
 
     @property
     def weapons(self):
