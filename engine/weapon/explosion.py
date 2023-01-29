@@ -2,12 +2,12 @@ import pygame
 
 
 class Explosion(pygame.sprite.Sprite):
-    def __init__(self, x, y, explosion_speed=10):
+    def __init__(self, x, y, explosion_speed=10, image_path="resources/exp", scale=(150, 150)):
         super().__init__()
         self.__images_list = []
         for image_number in range(1, 6):
-            image = pygame.image.load(f"resources/exp{image_number}.png")
-            image = pygame.transform.scale(image, (150, 150))
+            image = pygame.image.load(f"{image_path}{image_number}.png")
+            image = pygame.transform.scale(image, scale)
             self.__images_list.append(image)
         self.__current_index = 0
         self.image = self.__images_list[self.__current_index]

@@ -30,7 +30,7 @@ class GameManager:
         self.__main_menu = MainMenu(self.__screen, width, height)
 
         # Create levels
-        first_level = Level(self.__screen, self.__width, self.__height, alien_shooting_time=800)
+        first_level = Level(self.__screen, self.__width, self.__height, alien_shooting_time=600)
         self.__levels = [first_level]
         self.__current_level = first_level
 
@@ -38,7 +38,8 @@ class GameManager:
         self.__alien_timer = pygame.USEREVENT + 1
 
         # Create group for explosions
-        self.__explosions = pygame.sprite.Group()
+        self.__cannon_explosions = pygame.sprite.Group()
+        self.__laser_explosions = pygame.sprite.Group()
 
         # Import sound
         self.__pop_sound = pygame.mixer.Sound("audio/pop.wav")
@@ -98,8 +99,10 @@ class GameManager:
             weapon.weapon_shots.draw(self.__screen)
 
     def __explosions_handler(self):
-        self.__explosions.draw(self.__screen)
-        self.__explosions.update()
+        self.__cannon_explosions.draw(self.__screen)
+        self.__cannon_explosions.update()
+        self.__laser_explosions.draw(self.__screen)
+        self.__laser_explosions.update()
 
     def __check_collisions(self):
         # Check player lasers and cannon
@@ -113,31 +116,42 @@ class GameManager:
                             self.__player.score += 1
                         if block_collisions or alien_collisions:
                             explosion = Explosion(bullet.rect.x, bullet.rect.y, 7)
-                            self.__explosions.add(explosion)
+                            self.__cannon_explosions.add(explosion)
                             bullet.kill()
                             self.__explosions_sound.play()
                             pygame.sprite.spritecollide(explosion, self.__current_level.blocks, True)
 
-                            extra_alien_collisions = pygame.sprite.spritecollide(explosion, self.__current_level.aliens, True)
+                            extra_alien_collisions = pygame.sprite.spritecollide(explosion, self.__current_level.aliens,
+                                                                                 True)
                             for alien in extra_alien_collisions:
                                 self.__player.score += 1
                 else:
                     for bullet in weapon.weapon_shots:
                         if pygame.sprite.spritecollide(bullet, self.__current_level.blocks, True):
                             bullet.kill()
+                            explosion = Explosion(bullet.rect.x, bullet.rect.y, 3, "resources/laserexp", (70, 70))
+                            self.__laser_explosions.add(explosion)
                         if pygame.sprite.spritecollide(bullet, self.__current_level.aliens, True):
                             self.__player.score += 1
                             bullet.kill()
                             self.__pop_sound.play()
+                            explosion = Explosion(bullet.rect.x, bullet.rect.y, 3, "resources/laserexp", (70, 70))
+                            self.__laser_explosions.add(explosion)
 
         # Check alien lasers
         if self.__current_level.alien_weapons:
             for weapon in self.__current_level.alien_weapons:
                 if pygame.sprite.spritecollide(weapon, self.__current_level.blocks, True):
                     weapon.kill()
+                    self.__pop_sound.play()
+                    explosion = Explosion(weapon.rect.x, weapon.rect.y, 3, "resources/laserexp", (70, 70))
+                    self.__laser_explosions.add(explosion)
                 if pygame.sprite.spritecollide(weapon, self.__player_sprite, False):
                     self.__player.health -= self.__current_level.alien_damage
                     weapon.kill()
+                    self.__pop_sound.play()
+                    explosion = Explosion(weapon.rect.x, weapon.rect.y, 3, "resources/laserexp", (70, 70))
+                    self.__laser_explosions.add(explosion)
 
         # Check alien collisions
         if self.__current_level.aliens:
