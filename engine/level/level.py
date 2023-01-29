@@ -6,7 +6,7 @@ from engine.enemy.block import obstacle_shape, Block
 
 
 class Level:
-    def __init__(self, screen, width, height, obstacle_amount=6, alien_rows=6, alien_columns=8):
+    def __init__(self, screen, width, height, obstacle_amount=6, alien_rows=6, alien_columns=16, alien_damage=15):
         # Initialize level attributes
         self.__screen = screen
         self.__width = width
@@ -29,6 +29,7 @@ class Level:
         self.__alien_direction = 2
         self.__aliens = pygame.sprite.Group()
         self.__aliens_weapons = pygame.sprite.Group()
+        self.__alien_damage = alien_damage
 
     @property
     def is_level_locked(self):
@@ -57,6 +58,10 @@ class Level:
     @property
     def aliens(self):
         return self.__aliens
+
+    @property
+    def alien_damage(self):
+        return self.__alien_damage
 
     def enemy_handler(self):
         self.__blocks.draw(self.__screen)

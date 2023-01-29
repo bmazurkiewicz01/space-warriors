@@ -80,6 +80,9 @@ class GameManager:
         self.__player_sprite = pygame.sprite.GroupSingle(self.__player)
 
     def __player_handler(self):
+        if self.__player.health <= 0:
+            print("PLAYER IS DEAD")
+
         self.__player_sprite.update()
         self.__player_sprite.draw(self.__screen)
         self.__check_collisions()
@@ -115,7 +118,7 @@ class GameManager:
                 if pygame.sprite.spritecollide(weapon, self.__current_level.blocks, True):
                     weapon.kill()
                 if pygame.sprite.spritecollide(weapon, self.__player_sprite, False):
-                    print("Player was hit")
+                    self.__player.health -= self.__current_level.alien_damage
                     weapon.kill()
 
         # Check alien collisions
@@ -124,4 +127,4 @@ class GameManager:
                 pygame.sprite.spritecollide(alien, self.__current_level.blocks, True)
 
                 if pygame.sprite.spritecollide(alien, self.__player_sprite, False):
-                    print("Player is dead")
+                    self.__player.health = 0
