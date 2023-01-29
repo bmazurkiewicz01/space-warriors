@@ -3,7 +3,6 @@ from random import choice
 
 from engine.enemy.alien import Alien
 from engine.enemy.block import obstacle_shape, Block
-from engine.weapon.laser.laser import Laser
 
 
 class Level:
@@ -47,6 +46,18 @@ class Level:
     def is_level_finished(self, new_value):
         self.__is_level_finished = new_value
 
+    @property
+    def alien_weapons(self):
+        return self.__aliens_weapons
+
+    @property
+    def blocks(self):
+        return self.__blocks
+
+    @property
+    def aliens(self):
+        return self.__aliens
+
     def enemy_handler(self):
         self.__blocks.draw(self.__screen)
         self.__aliens.draw(self.__screen)
@@ -70,6 +81,16 @@ class Level:
                         self.__blocks.add(block)
 
     def initialize_aliens(self, x_offset=100, y_offset=80, x_start=70, y_start=60):
+        # Initialize obstacles
+        self.__obstacle_shape = obstacle_shape
+        self.__blocks = pygame.sprite.Group()
+        obstacle_offsets = [num * (self.__width / self.__obstacle_amount) for num in range(self.__obstacle_amount)]
+        self.__create_obstacles(self.__width / 25, 650, *obstacle_offsets)
+
+        # Initialize aliens
+        self.__aliens = pygame.sprite.Group()
+        self.__aliens_weapons = pygame.sprite.Group()
+
         for row_index, row in enumerate(range(self.__alien_rows)):
             for column_index, column in enumerate(range(self.__alien_columns)):
                 x = column_index * x_offset + x_start

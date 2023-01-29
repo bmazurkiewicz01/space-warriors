@@ -4,6 +4,8 @@ import sys
 from engine.level.level import Level
 from engine.menu.menu import MainMenu
 from engine.player import Player
+from engine.weapon.cannon.cannon import Cannon
+from engine.weapon.explosion import Explosion
 
 
 class GameManager:
@@ -36,6 +38,9 @@ class GameManager:
         self.__alien_timer = pygame.USEREVENT + 1
         pygame.time.set_timer(self.__alien_timer, 1150)
 
+        # Create group for explosions
+        self.__explosions = pygame.sprite.Group()
+
     def run(self) -> None:
         # Main game loop
         while self.__is_running:
@@ -50,6 +55,7 @@ class GameManager:
                     pygame.time.wait(100)
                 self.__player_handler()
                 self.__current_level.enemy_handler()
+                self.__explosions_handler()
             else:
                 self.__main_menu.run()
 
@@ -76,5 +82,46 @@ class GameManager:
     def __player_handler(self):
         self.__player_sprite.update()
         self.__player_sprite.draw(self.__screen)
+        self.__check_collisions()
         for weapon in self.__player.weapons:
             weapon.weapon_shots.draw(self.__screen)
+
+    def __explosions_handler(self):
+        self.__explosions.draw(self.__screen)
+        self.__explosions.update()
+
+    def __check_collisions(self):
+        # Check player lasers and cannon
+        if self.__player.weapons:
+            for weapon in self.__player.weapons:
+                if isinstance(weapon, Cannon):
+                    for bullet in weapon.weapon_shots:
+                        if pygame.sprite.spritecollide(bullet, self.__current_level.blocks, True) or pygame.sprite.spritecollide(bullet, self.__current_level.aliens, True):
+                            explosion = Explosion(bullet.rect.x, bullet.rect.y, 7)
+                            self.__explosions.add(explosion)
+                            bullet.kill()
+                            pygame.sprite.spritecollide(explosion, self.__current_level.aliens, True)
+                            pygame.sprite.spritecollide(explosion, self.__current_level.blocks, True)
+                else:
+                    for bullet in weapon.weapon_shots:
+                        if pygame.sprite.spritecollide(bullet, self.__current_level.blocks, True):
+                            bullet.kill()
+                        if pygame.sprite.spritecollide(bullet, self.__current_level.aliens, True):
+                            bullet.kill()
+
+        # Check alien lasers
+        if self.__current_level.alien_weapons:
+            for weapon in self.__current_level.alien_weapons:
+                if pygame.sprite.spritecollide(weapon, self.__current_level.blocks, True):
+                    weapon.kill()
+                if pygame.sprite.spritecollide(weapon, self.__player_sprite, False):
+                    print("Player was hit")
+                    weapon.kill()
+
+        # Check alien collisions
+        if self.__current_level.aliens:
+            for alien in self.__current_level.aliens:
+                pygame.sprite.spritecollide(alien, self.__current_level.blocks, True)
+
+                if pygame.sprite.spritecollide(alien, self.__player_sprite, False):
+                    print("Player is dead")
