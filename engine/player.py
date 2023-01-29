@@ -11,6 +11,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom=player_position)
         self.__screen = screen
         self.__health = 100
+        self.__score = 0
 
         # Player movement attributes
         self.__screen_width = screen_width
@@ -32,6 +33,14 @@ class Player(pygame.sprite.Sprite):
     @property
     def weapons(self):
         return self.__weapons
+
+    @property
+    def score(self):
+        return self.__score
+
+    @score.setter
+    def score(self, new_value):
+        self.__score = new_value
 
     def __get_user_input(self):
         keys = pygame.key.get_pressed()
@@ -80,14 +89,25 @@ class Player(pygame.sprite.Sprite):
         text_rect.y = y - 25
         self.__screen.blit(health_name_text, text_rect)
 
+    def __display_score(self):
+        font = pygame.font.Font(None, 30)
+        health_name_text = font.render(f"Score: {self.__score}", True, (255, 255, 255))
+        text_rect = health_name_text.get_rect()
+        text_rect.x = 10
+        text_rect.y = 10
+        self.__screen.blit(health_name_text, text_rect)
+
     def update(self):
         # Refresh player status
         self.__get_user_input()
         self.__adjust_player_position()
-        self.__render_health_bar(self.__health / 100, 10, self.__screen_height - 30, 100, 20, (255, 0, 100), (255, 255, 255))
+        self.__render_health_bar(self.__health / 100, 10, self.__screen_height - 30, 100, 20, (255, 0, 100),
+                                 (255, 255, 255))
+        self.__display_score()
 
         # Refresh weapons status
-        self.__weapons[0].refresh_weapon(self.__screen, 120, self.__screen_height - 30, (169, 169, 169), (255, 255, 255))
+        self.__weapons[0].refresh_weapon(self.__screen, 120, self.__screen_height - 30, (169, 169, 169),
+                                         (255, 255, 255))
         self.__weapons[1].refresh_weapon(self.__screen, self.__screen_width - 220, self.__screen_height - 30,
                                          (255, 0, 0), (255, 255, 255))
         self.__weapons[2].refresh_weapon(self.__screen, self.__screen_width - 110, self.__screen_height - 30,
