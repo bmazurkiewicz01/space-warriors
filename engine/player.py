@@ -19,8 +19,16 @@ class Player(pygame.sprite.Sprite):
         self.__speed = speed
 
         # Create weapons objects
-        self.__weapons = [Cannon(3000, screen_height, "Cannon"), Laser(1200, screen_height, "Red Laser", (255, 0, 0)),
-                          Laser(1200, screen_height, "Blue Laser", (0, 0, 255))]
+        self.__weapons = [Cannon(3000, screen_height, "Cannon"), Laser(600, screen_height, "Red Laser", (255, 0, 0)),
+                          Laser(600, screen_height, "Blue Laser", (0, 0, 255))]
+
+        # Laser sound
+        self.__laser_sound = pygame.mixer.Sound("audio/laser.wav")
+        self.__laser_sound.set_volume(0.4)
+
+        # Cannon sound
+        self.__cannon_sound = pygame.mixer.Sound("audio/cannon_shoot.wav")
+        self.__cannon_sound.set_volume(0.6)
 
     @property
     def health(self):
@@ -44,7 +52,6 @@ class Player(pygame.sprite.Sprite):
 
     def __get_user_input(self):
         keys = pygame.key.get_pressed()
-        mouse = pygame.mouse.get_pressed()
 
         # Movement event handler
         if keys[pygame.K_a] or keys[pygame.K_LEFT]:
@@ -53,18 +60,21 @@ class Player(pygame.sprite.Sprite):
             self.rect.x += self.__speed
 
         # Cannon event handler
-        if (mouse == (0, 1, 0) or keys[pygame.K_SPACE]) and self.__weapons[0].is_weapon_available:
+        if (keys[pygame.K_SPACE]) and self.__weapons[0].is_weapon_available:
+            self.__cannon_sound.play()
             self.__weapons[0].shoot_weapon((self.rect.centerx, self.rect.centery - 64))
             self.__weapons[0].is_weapon_available = False
             self.__weapons[0].time = pygame.time.get_ticks()
-        if (mouse == (1, 0, 0) or keys[pygame.K_q]) and self.__weapons[1].is_weapon_available:
+        if (keys[pygame.K_q]) and self.__weapons[1].is_weapon_available:
             self.__weapons[1].shoot_weapon((self.rect.centerx - 51.5, self.rect.centery - 32))
             self.__weapons[1].is_weapon_available = False
             self.__weapons[1].time = pygame.time.get_ticks()
-        if (mouse == (0, 0, 1) or keys[pygame.K_e]) and self.__weapons[2].is_weapon_available:
+            self.__laser_sound.play()
+        if (keys[pygame.K_e]) and self.__weapons[2].is_weapon_available:
             self.__weapons[2].shoot_weapon((self.rect.centerx + 51.5, self.rect.centery - 32))
             self.__weapons[2].is_weapon_available = False
             self.__weapons[2].time = pygame.time.get_ticks()
+            self.__laser_sound.play()
 
     def __adjust_player_position(self):
         if self.rect.left <= 0:

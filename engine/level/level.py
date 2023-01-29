@@ -7,7 +7,7 @@ from engine.enemy.block import obstacle_shape, Block
 
 class Level:
     def __init__(self, screen, width, height, obstacle_amount=6, alien_rows=6, alien_columns=16, alien_damage=15,
-                 alien_shooting_time=1200):
+                 alien_shooting_time=1200, level_audio_path="audio/game_music.wav"):
         # Initialize level attributes
         self.__screen = screen
         self.__width = width
@@ -32,6 +32,12 @@ class Level:
         self.__aliens_weapons = pygame.sprite.Group()
         self.__alien_damage = alien_damage
         self.__alien_shooting_time = alien_shooting_time
+
+        # Level audio
+        self.__level_music = pygame.mixer.Sound(level_audio_path)
+        self.__level_music.set_volume(0.2)
+        self.__laser_sound = pygame.mixer.Sound("audio/laser.wav")
+        self.__laser_sound.set_volume(0.4)
 
     @property
     def is_level_locked(self):
@@ -68,6 +74,10 @@ class Level:
     @property
     def alien_shooting_time(self):
         return self.__alien_shooting_time
+
+    @property
+    def game_music(self):
+        return self.__level_music
 
     def enemy_handler(self):
         self.__blocks.draw(self.__screen)
@@ -128,3 +138,5 @@ class Level:
         if self.__aliens.sprites():
             alien = choice(self.__aliens.sprites())
             self.__aliens_weapons.add(alien.prepare_laser(self.__height))
+            self.__laser_sound.play()
+

@@ -40,7 +40,13 @@ class GameManager:
         # Create group for explosions
         self.__explosions = pygame.sprite.Group()
 
-    def run(self) -> None:
+        # Import sound
+        self.__pop_sound = pygame.mixer.Sound("audio/pop.wav")
+        self.__pop_sound.set_volume(0.4)
+        self.__explosions_sound = pygame.mixer.Sound("audio/explosion.wav")
+        self.__explosions_sound.set_volume(0.7)
+
+    def run(self):
         # Main game loop
         while self.__is_running:
             self.__screen.fill((30, 30, 30))
@@ -51,8 +57,9 @@ class GameManager:
                     self.__main_menu.new_game = False
                     self.__initialize_player()
                     self.__current_level.initialize_aliens()
+                    self.__current_level.game_music.play(loops=-1)
                     pygame.time.set_timer(self.__alien_timer, self.__current_level.alien_shooting_time)
-                    pygame.time.wait(100)
+                    pygame.time.wait(10)
                 self.__player_handler()
                 self.__current_level.enemy_handler()
                 self.__explosions_handler()
@@ -68,6 +75,7 @@ class GameManager:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.__main_menu.is_play_clicked = False
+                        self.__current_level.game_music.stop()
                 if event.type == self.__alien_timer:
                     self.__current_level.alien_attack()
 
@@ -107,6 +115,7 @@ class GameManager:
                             explosion = Explosion(bullet.rect.x, bullet.rect.y, 7)
                             self.__explosions.add(explosion)
                             bullet.kill()
+                            self.__explosions_sound.play()
                             pygame.sprite.spritecollide(explosion, self.__current_level.blocks, True)
 
                             extra_alien_collisions = pygame.sprite.spritecollide(explosion, self.__current_level.aliens, True)
@@ -119,6 +128,7 @@ class GameManager:
                         if pygame.sprite.spritecollide(bullet, self.__current_level.aliens, True):
                             self.__player.score += 1
                             bullet.kill()
+                            self.__pop_sound.play()
 
         # Check alien lasers
         if self.__current_level.alien_weapons:
