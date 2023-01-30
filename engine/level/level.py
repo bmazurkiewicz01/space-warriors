@@ -6,7 +6,8 @@ from engine.enemy.block import obstacle_shape, Block
 
 
 class Level:
-    def __init__(self, screen, width, height, obstacle_amount=6, alien_rows=6, alien_columns=16, alien_damage=15,
+    def __init__(self, screen, width, height, level_name, obstacle_amount=6, alien_rows=6, alien_columns=16,
+                 alien_damage=15,
                  alien_shooting_time=1200, level_audio_path="audio/game_music.wav"):
         # Initialize level attributes
         self.__screen = screen
@@ -17,6 +18,7 @@ class Level:
 
         self.__is_level_locked = False
         self.__is_level_finished = False
+        self.__level_name = level_name
 
         # Initialize obstacles
         self.__obstacle_shape = obstacle_shape
@@ -79,6 +81,10 @@ class Level:
     def game_music(self):
         return self.__level_music
 
+    @property
+    def level_name(self):
+        return self.__level_name
+
     def enemy_handler(self):
         self.__blocks.draw(self.__screen)
         self.__aliens.draw(self.__screen)
@@ -139,4 +145,3 @@ class Level:
             alien = choice(self.__aliens.sprites())
             self.__aliens_weapons.add(alien.prepare_laser(self.__height))
             self.__laser_sound.play()
-

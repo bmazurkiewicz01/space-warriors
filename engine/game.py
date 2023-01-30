@@ -21,6 +21,8 @@ class GameManager:
         self.__height = height
         self.__screen = pygame.display.set_mode((width, height))
         self.__clock = pygame.time.Clock()
+        self.__font = pygame.font.SysFont("arialblack", 48)
+        self.__is_game_stopped = True
 
         # Player handler variables
         self.__player = 0
@@ -30,7 +32,8 @@ class GameManager:
         self.__main_menu = MainMenu(self.__screen, width, height)
 
         # Create levels
-        first_level = Level(self.__screen, self.__width, self.__height, alien_shooting_time=600)
+        first_level = Level(self.__screen, self.__width, self.__height, level_name="The Martian Invasion",
+                            alien_shooting_time=600)
         self.__levels = [first_level]
         self.__current_level = first_level
 
@@ -59,11 +62,15 @@ class GameManager:
                     self.__initialize_player()
                     self.__current_level.initialize_aliens()
                     self.__current_level.game_music.play(loops=-1)
+                    self.__is_game_stopped = False
                     pygame.time.set_timer(self.__alien_timer, self.__current_level.alien_shooting_time)
                     pygame.time.wait(10)
-                self.__player_handler()
-                self.__current_level.enemy_handler()
-                self.__explosions_handler()
+                if not self.__is_game_stopped:
+                    self.__player_handler()
+                    self.__current_level.enemy_handler()
+                    self.__explosions_handler()
+                self.__check_victory_condition()
+                self.__check_player_health()
             else:
                 self.__main_menu.run()
 
@@ -77,7 +84,7 @@ class GameManager:
                     if event.key == pygame.K_ESCAPE:
                         self.__main_menu.is_play_clicked = False
                         self.__current_level.game_music.stop()
-                if event.type == self.__alien_timer:
+                if event.type == self.__alien_timer and not self.__is_game_stopped:
                     self.__current_level.alien_attack()
 
             # Refresh screen
@@ -89,20 +96,57 @@ class GameManager:
         self.__player_sprite = pygame.sprite.GroupSingle(self.__player)
 
     def __player_handler(self):
-        if self.__player.health <= 0:
-            print("PLAYER IS DEAD")
-
         self.__player_sprite.update()
         self.__player_sprite.draw(self.__screen)
         self.__check_collisions()
         for weapon in self.__player.weapons:
             weapon.weapon_shots.draw(self.__screen)
 
+    def __check_player_health(self):
+        if self.__player.health <= 0:
+            self.__is_game_stopped = True
+            victory_text = self.__font.render(f"You died!", False, "white")
+            new_game_font = pygame.font.SysFont("arialblack", 24)
+            new_game_text = new_game_font.render(f"Please click escape to start a new game", False, "red")
+
+            victory_rect = victory_text.get_rect()
+            victory_rect.centerx = self.__width / 2
+            victory_rect.centery = self.__height / 2 - 100
+            self.__screen.blit(victory_text, victory_rect)
+
+            new_game_rect = new_game_text.get_rect()
+            new_game_rect.centerx = self.__width / 2
+            new_game_rect.centery = self.__height / 2 - 25
+            self.__screen.blit(new_game_text, new_game_rect)
+
     def __explosions_handler(self):
         self.__cannon_explosions.draw(self.__screen)
         self.__cannon_explosions.update()
         self.__laser_explosions.draw(self.__screen)
         self.__laser_explosions.update()
+
+    def __check_victory_condition(self):
+        if not self.__current_level.aliens:
+            self.__is_game_stopped = True
+            victory_text = self.__font.render(f"You finished level: {self.__current_level.level_name}!", False, "white")
+            score_text = self.__font.render(f"Your score is {self.__player.score}", False, "white")
+            new_game_font = pygame.font.SysFont("arialblack", 24)
+            new_game_text = new_game_font.render(f"Please click escape to start a new game", False, "red")
+
+            victory_rect = victory_text.get_rect()
+            victory_rect.centerx = self.__width / 2
+            victory_rect.centery = self.__height / 2 - 100
+            self.__screen.blit(victory_text, victory_rect)
+
+            score_rect = score_text.get_rect()
+            score_rect.centerx = self.__width / 2
+            score_rect.centery = self.__height / 2
+            self.__screen.blit(score_text, score_rect)
+
+            new_game_rect = new_game_text.get_rect()
+            new_game_rect.centerx = self.__width / 2
+            new_game_rect.centery = self.__height / 2 + 50
+            self.__screen.blit(new_game_text, new_game_rect)
 
     def __check_collisions(self):
         # Check player lasers and cannon
