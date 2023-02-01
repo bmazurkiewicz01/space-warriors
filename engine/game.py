@@ -9,7 +9,43 @@ from engine.weapon.explosion import Explosion
 
 
 class GameManager:
+    """
+    The main class that manages the game.
+
+    Attributes:
+        __is_running (bool): flag indicating if the game is running.
+        __width (int): width of the game screen.
+        __height (int): height of the game screen.
+        __screen (pygame.Surface): surface representing the game screen.
+        __clock (pygame.time.Clock): clock used to control the game's fps.
+        __font (pygame.font.Font): font used for displaying text on the screen.
+        __is_game_stopped (bool): flag indicating if the game is currently stopped.
+        __player_won (bool): flag indicating if the player has won the game.
+        __player (Player): player object in the game.
+        __player_sprite (pygame.sprite.Sprite): sprite for the player object.
+        __main_menu (MainMenu): object representing the main menu of the game.
+        __levels (list of Level): list of level objects in the game.
+        __previous_level_index (int): index of the previous level.
+        __level_index (int): index of the current level.
+        __alien_timer (int): timer event for the aliens' attack.
+        __cannon_explosions (pygame.sprite.Group): group of cannon explosions.
+        __laser_explosions (pygame.sprite.Group): group of laser explosions.
+        __pop_sound (pygame.mixer.Sound): sound for pop.
+        __explosions_sound (pygame.mixer.Sound): sound for explosions.
+
+    Methods:
+        run(): Main game loop, manages game states and events.
+        __initialize_player(): Initializes player object.
+        __player_handler(): Handles player actions.
+        __explosions_handler(): Handles explosions in the game.
+        __check_victory_condition(): Check if the player has won the game.
+        __check_player_health(): Check the health of the player and stop the game if health is zero.
+    """
+
     def __init__(self, width, height, levels):
+        """
+        The constructor for the GameManager class. It initializes the game window and sets up all the game attributes.
+        """
         # Initialize pygame window
         pygame.init()
         pygame.display.set_caption("Space Warriors")
@@ -55,6 +91,9 @@ class GameManager:
         self.__explosions_sound.set_volume(0.7)
 
     def run(self):
+        """
+        The main game loop which handles the user interactions and updates the game state.
+        """
         # Main game loop
         while self.__is_running:
             self.__screen.fill((30, 30, 30))
@@ -99,10 +138,16 @@ class GameManager:
             self.__clock.tick(60)
 
     def __initialize_player(self):
+        """
+        A helper method to initialize the player's ship.
+        """
         self.__player = Player((self.__width / 2, self.__height - 80), self.__width, self.__height, 10, self.__screen)
         self.__player_sprite = pygame.sprite.GroupSingle(self.__player)
 
     def __player_handler(self):
+        """
+        A helper method to handle the player's ship.
+        """
         self.__player_sprite.update()
         self.__player_sprite.draw(self.__screen)
         self.__check_collisions()
@@ -110,6 +155,9 @@ class GameManager:
             weapon.weapon_shots.draw(self.__screen)
 
     def __check_player_health(self):
+        """
+        Check if the player's health is less than or equal to zero, stop the game and set the appropriate flags.
+        """
         if self.__player.health <= 0:
             self.__is_game_stopped = True
             victory_text = self.__font.render(f"You died!", False, "white")
@@ -127,12 +175,19 @@ class GameManager:
             self.__screen.blit(new_game_text, new_game_rect)
 
     def __explosions_handler(self):
+        """
+        Handle and update the explosion animations and sounds of both laser and cannon explosions.
+        """
         self.__cannon_explosions.draw(self.__screen)
         self.__cannon_explosions.update()
         self.__laser_explosions.draw(self.__screen)
         self.__laser_explosions.update()
 
     def __check_victory_condition(self):
+        """
+        Check if the player has won the current level by destroying all aliens.
+        If either of the conditions is met, stop the game and set the appropriate flags.
+        """
         if not self.__levels[self.__level_index].aliens:
             if not self.__player_won:
                 self.__levels[self.__level_index].game_music.stop()
@@ -164,6 +219,11 @@ class GameManager:
             self.__screen.blit(new_game_text, new_game_rect)
 
     def __check_collisions(self):
+        """
+        This method checks for collisions between the player's weapons, cannon, alien's weapons and aliens.
+        It detects the type of weapon and based on that updates the score and sets explosions for different
+        weapons. If an alien laser collides with the player, the player's health decreases.
+        """
         # Check player lasers and cannon
         if self.__player.weapons:
             for weapon in self.__player.weapons:
