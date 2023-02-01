@@ -1,5 +1,9 @@
+import json
 from engine.game import GameManager
 
 if __name__ == '__main__':
-    game_manager = GameManager(1920, 1080)
+    with open("config.json") as file:
+        config = json.load(file)
+
+    game_manager = GameManager(config["width"], config["height"], config["levels"])
     game_manager.run()

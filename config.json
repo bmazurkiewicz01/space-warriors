@@ -1,0 +1,24 @@
+{
+  "width": 1920,
+  "height": 1080,
+  "levels": [
+    {
+      "level_name": "The Big Martian Invasion",
+      "obstacle_amount": 6,
+      "alien_rows": 6,
+      "alien_columns": 16,
+      "alien_damage": 15,
+      "alien_shooting_time": 600,
+      "level_audio_path": "audio/game_music.wav"
+    },
+    {
+      "level_name": "The Little Martian Invasion",
+      "obstacle_amount": 4,
+      "alien_rows": 1,
+      "alien_columns": 16,
+      "alien_damage": 15,
+      "alien_shooting_time": 600,
+      "level_audio_path": "audio/game_music.wav"
+    }
+  ]
+}
